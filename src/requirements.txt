@@ -1,0 +1,2 @@
+# Runtime dependencies packaged by `sam build`, one per line.
+# boto3 is provided by the Lambda Python runtime, so nothing is needed yet.
