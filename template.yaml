@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-python-starter: an HTTP API function and an SQS consumer function
+  sharing one DynamoDB table.
+
+Parameters:
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues: [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [arm64]
+    CodeUri: src/
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ItemsTable
+        LOG_LEVEL: !Ref LogLevel
+        SERVICE_NAME: !Ref AWS::StackName
+
+Resources:
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.api.handler
+      Description: POST /items and GET /items/{id}
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+              Resource: !GetAtt ItemsTable.Arn
+      Events:
+        CreateItem:
+          Type: HttpApi
+          Properties:
+            Path: /items
+            Method: POST
+        GetItem:
+          Type: HttpApi
+          Properties:
+            Path: /items/{id}
+            Method: GET
+
+  QueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.queue.handler
+      Description: Stores items received on the queue
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: !GetAtt ItemsTable.Arn
+      Events:
+        Items:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ItemsQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  ItemsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      # Must be at least the function timeout; AWS recommends six times it.
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ItemsDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  ItemsDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the HTTP API
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  QueueUrl:
+    Description: Send item JSON here to have it stored by QueueFunction
+    Value: !Ref ItemsQueue
+  DeadLetterQueueUrl:
+    Description: Messages that failed three times end up here
+    Value: !Ref ItemsDeadLetterQueue
+  TableName:
+    Value: !Ref ItemsTable
