@@ -1,0 +1,32 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /items/{id}",
+  "rawPath": "/items/item-001",
+  "rawQueryString": "",
+  "headers": {
+    "accept": "application/json",
+    "host": "abc123example.execute-api.us-east-1.amazonaws.com",
+    "user-agent": "curl/8.4.0"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "abc123example",
+    "domainName": "abc123example.execute-api.us-east-1.amazonaws.com",
+    "http": {
+      "method": "GET",
+      "path": "/items/item-001",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "203.0.113.10",
+      "userAgent": "curl/8.4.0"
+    },
+    "requestId": "example-request-id-0001",
+    "routeKey": "GET /items/{id}",
+    "stage": "$default",
+    "time": "10/May/2024:12:00:00 +0000",
+    "timeEpoch": 1715342400000
+  },
+  "pathParameters": {
+    "id": "item-001"
+  },
+  "isBase64Encoded": false
+}

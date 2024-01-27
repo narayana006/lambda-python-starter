@@ -1,0 +1,29 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /items",
+  "rawPath": "/items",
+  "rawQueryString": "",
+  "headers": {
+    "content-type": "application/json",
+    "host": "abc123example.execute-api.us-east-1.amazonaws.com"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "abc123example",
+    "domainName": "abc123example.execute-api.us-east-1.amazonaws.com",
+    "http": {
+      "method": "POST",
+      "path": "/items",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "203.0.113.10",
+      "userAgent": "curl/8.4.0"
+    },
+    "requestId": "example-request-id-0002",
+    "routeKey": "POST /items",
+    "stage": "$default",
+    "time": "10/May/2024:12:00:05 +0000",
+    "timeEpoch": 1715342405000
+  },
+  "body": "{\"id\": \"item-100\", \"name\": \"Desk lamp\", \"quantity\": 4}",
+  "isBase64Encoded": false
+}
